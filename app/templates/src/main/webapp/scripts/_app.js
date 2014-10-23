@@ -4,7 +4,7 @@
 var httpHeaders;<% } %>
 
 var <%= angularAppName %> = angular.module('<%= angularAppName %>', ['http-auth-interceptor', 'tmh.dynamicLocale',
-    'ngResource', 'ngRoute', 'ngCookies', '<%= angularAppName %>Utils', 'pascalprecht.translate', 'truncate']);
+    'ngResource', 'ngRoute', 'ngCookies', '<%= angularAppName %>Utils', 'pascalprecht.translate', 'truncate', 'restangular']);
 
 <%= angularAppName %>
     .config(function ($routeProvider, $httpProvider, $translateProvider, tmhDynamicLocaleProvider, USER_ROLES) {

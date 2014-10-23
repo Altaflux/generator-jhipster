@@ -478,6 +478,7 @@ JhipsterGenerator.prototype.app = function app() {
     this.template('src/main/java/package/config/_LoggingAspectConfiguration.java', javaDir + 'config/LoggingAspectConfiguration.java');
     this.template('src/main/java/package/config/_MailConfiguration.java', javaDir + 'config/MailConfiguration.java');
     this.template('src/main/java/package/config/_MetricsConfiguration.java', javaDir + 'config/MetricsConfiguration.java');
+	this.template('src/main/java/package/config/_DataRestConfigurer.java', javaDir + 'config/DataRestConfigurer.java');
 
     if (this.authenticationType == 'token') {
         this.template('src/main/java/package/config/oauth2/_MongoDBTokenStore.java', javaDir + 'config/oauth2/MongoDBTokenStore.java');
@@ -671,6 +672,8 @@ JhipsterGenerator.prototype.app = function app() {
     this.template(webappDir + 'scripts/_services.js', webappDir + 'scripts/services.js');
     this.template(webappDir + 'scripts/_directives.js', webappDir + 'scripts/directives.js');
     this.template(webappDir + 'scripts/_utils.js', webappDir + 'scripts/utils.js');
+	this.template(webappDir + 'scripts/_restangular-config.js', webappDir + 'scripts/restangular-config.js');
+	this.template(webappDir + 'scripts/_pageable.js', webappDir + 'scripts/pageable.js');
 
     // Create Test Javascript files
     var testJsDir = 'src/test/javascript/';
@@ -700,6 +703,8 @@ JhipsterGenerator.prototype.app = function app() {
         'bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.js',
         'bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
         'bower_components/angular-dynamic-locale/src/tmhDinamicLocale.js',
+        'bower_components/restangular/dist/restangular.js',
+		'bower_components/lodash/dist/lodash.js',
 
         'scripts/http-auth-interceptor.js',
         'scripts/truncate.js',
@@ -708,7 +713,9 @@ JhipsterGenerator.prototype.app = function app() {
         'scripts/constants.js',
         'scripts/controllers.js',
         'scripts/services.js',
-        'scripts/directives.js'];
+        'scripts/directives.js',
+		'scripts/pageable.js',
+		'scripts/restangular-config.js'];
 
     if (this.websocket == 'atmosphere') {
         indexScripts = indexScripts.concat([

@@ -124,4 +124,26 @@ angular.module('<%= angularAppName %>')
                 });
             }
         };
+	})	
+	.directive('sorted', function() {
+        return {
+            restriction: 'A',
+            scope: {
+                pager: '=pager',
+                attribute: '@sortBy'
+            },
+            transclude: true,
+            template: '<a ng-click="do_sort()" ng-transclude></a>' + ' <span ng-show="do_show(\'desc\')"><i class="glyphicon glyphicon-circle-arrow-down"></i></span>' + '<span ng-show="do_show(\'asc\')"><i class="glyphicon glyphicon-circle-arrow-up"></i></span>',
+            controller: function($scope, $element, $attrs) {
+                $scope.sort_by = $scope.attribute;
+
+                $scope.do_sort = function() {
+                    $scope.pager.sort($scope.sort_by);
+                };
+                $scope.do_show = function(asc) {
+                    return (asc != $scope.pager.sortDirection()) && ($scope.pager.sortOrder() == $scope.sort_by);
+                };
+            }
+        };
     });
+

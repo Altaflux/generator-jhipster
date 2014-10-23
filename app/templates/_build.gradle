@@ -109,6 +109,11 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: spring_boot_version<% } %>
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: spring_boot_version
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: spring_boot_version
+	compile(group: 'org.springframework.boot', name: 'spring-boot-starter-data-rest', version: spring_boot_version){
+		exclude module: 'spring-data-rest-webmvc'
+		exclude module: 'spring-data-rest-core'
+	}
+	compile group: 'org.springframework.data', name: 'spring-data-rest-webmvc', version: '2.3.0.BUILD-SNAPSHOT'
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: spring_boot_version) {
         exclude module: 'spring_boot-starter-tomcat'
     }

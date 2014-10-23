@@ -1,8 +1,12 @@
 'use strict';
 
-<%= angularAppName %>.factory('<%= entityClass %>', function ($resource) {
-        return $resource('app/rest/<%= entityInstance %>s/:id', {}, {
-            'query': { method: 'GET', isArray: true},
-            'get': { method: 'GET'}
-        });
-    });
+<%= angularAppName %>.factory('<%= entityClass %>', function (DataRestRestangular, ResourceConfigurer) {
+
+	var relations = ['self'<% for (relationshipId in relationships) {
+    if (relationships[relationshipId].relationshipType == 'many-to-one') {
+        var otherEntityName = relationships[relationshipId].otherEntityName;
+                        %>,'<%=otherEntityName %>'<% } } %>];
+						
+	ResourceConfigurer('<%= entityInstance %>', relations);
+	return DataRestRestangular.service('<%= entityInstance %>s');
+});

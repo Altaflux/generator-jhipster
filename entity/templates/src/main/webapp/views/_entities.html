@@ -44,7 +44,7 @@
                         %>
                         <div class="form-group">
                             <label><%=otherEntityName %></label>
-                            <select class="form-control" ng-model="<%=entityInstance %>.<%=otherEntityName %>.id" ng-options="<%=otherEntityName %>.id as <%=otherEntityName %>.<%=relationships[relationshipId].otherEntityField %> for <%=otherEntityName %> in <%=otherEntityName %>s">
+                            <select class="form-control" ng-model="<%=entityInstance %>.<%=otherEntityName %>" ng-options="<%=otherEntityName %>List.<%=relationships[relationshipId].otherEntityField %> for <%=otherEntityName %>List in <%=otherEntityName %>s track by <%=otherEntityName %>List.id">
                             </select>
                         </div><% } } %>
 
@@ -61,20 +61,30 @@
             </div>
         </div>
     </div>
-
+	
+	<div class="col-sm-3 col-md-3 pull-right">
+		<form class="navbar-form" role="search">
+			<div class="input-group">
+				<input type="text" class="form-control" placeholder="Search" name="srch-term" id="srch-term">
+				<div class="input-group-btn">
+					<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+				</div>
+			</div>
+		</form>
+	</div>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>ID</th><% for (fieldId in fields) { %>
-                    <th><%=fields[fieldId].fieldName%></th><% } %><% for (relationshipId in relationships) {
+                    <th sorted sort-by="id" pager="pagingData">ID</th><% for (fieldId in fields) { %>
+                    <th sorted sort-by="<%=fields[fieldId].fieldName%>" pager="pagingData"><%=fields[fieldId].fieldName%></th><% } %><% for (relationshipId in relationships) {
                         if (relationships[relationshipId].relationshipType == 'many-to-one') { %>
-                    <th><%=relationships[relationshipId].otherEntityName%></th><% } } %>
+                    <th sorted sort-by="<%=relationships[relationshipId].otherEntityName%>" pager="pagingData"><%=relationships[relationshipId].otherEntityName%></th><% } } %>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="<%=entityInstance %> in <%=entityInstance %>s">
+                <tr ng-repeat="<%=entityInstance %> in pagingData.data()">
                     <td>{{<%=entityInstance %>.id}}</td><% for (fieldId in fields) { %>
                     <td>{{<%=entityInstance %>.<%=fields[fieldId].fieldName%>}}</td><% } %><% for (relationshipId in relationships) {
                         if (relationships[relationshipId].relationshipType == 'many-to-one') { %>
@@ -86,7 +96,7 @@
                             <span class="glyphicon glyphicon-pencil"></span> Edit
                         </button>
                         <button type="submit"
-                                ng-click="delete(<%=entityInstance %>.id)"
+                                ng-click="delete(<%=entityInstance %>)"
                                 class="btn btn-danger">
                             <span class="glyphicon glyphicon-remove-circle"></span> Delete
                         </button>
@@ -94,5 +104,11 @@
                 </tr>
             </tbody>
         </table>
+		<ul class="pager">
+			<li class="previous {{pagingData.has_less()}}" ng-click="pagingData.show_previous()"><span>previous</span></li>
+			<li><span>{{pagingData.number() +1}}/{{pagingData.totalPages()}}
+					= {{pagingData.totalElements()}} Elements</span></li>
+			<li class="next {{pagingData.has_more()}}" ng-click="pagingData.show_next()"><span>next</span></li>
+		</ul>
     </div>
 </div>
