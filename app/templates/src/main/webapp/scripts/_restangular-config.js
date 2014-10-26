@@ -124,6 +124,5 @@ var GETLIST_OP = 'getList';
 
     return function(type, relations) {
         configureResource(type, relations);
-        configureResource(type + 's', relations);
     }
 });

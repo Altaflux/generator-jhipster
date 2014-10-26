@@ -2,11 +2,11 @@
 
 <%= angularAppName %>.controller('<%= entityClass %>Controller', function ($scope, Pageable, resolved<%= entityClass %>, <%= entityClass %><% for (relationshipId in relationships) { %>, resolved<%= relationships[relationshipId].otherEntityNameCapitalized %><% } %>) {
 
-        $scope.<%= entityInstance %>s = resolved<%= entityClass %>;<% for (relationshipId in relationships) { %>
-        $scope.<%= relationships[relationshipId].otherEntityName %>s = resolved<%= relationships[relationshipId].otherEntityNameCapitalized %>;<% } %>
+        $scope.<%= pluralEntityInstance %> = resolved<%= entityClass %>;<% for (relationshipId in relationships) { %>
+        $scope.<%= relationships[relationshipId].otherEntityNamePluralized %> = resolved<%= relationships[relationshipId].otherEntityNameCapitalized %>;<% } %>
 		$scope.<%= entityInstance %> = <%= entityClass %>.one();
 		
-		$scope.pagingData = new Pageable(<%= entityClass %>, resolved<%= entityClass %>);
+		$scope.pagingData = new Pageable(<%= entityClass %>, $scope.<%= pluralEntityInstance %>);
 		<% var searchMethods = [];
 			for (fieldId in fields) {
 				var likeMethod = '';

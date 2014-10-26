@@ -5,6 +5,7 @@ var util = require('util'),
         chalk = require('chalk'),
         _s = require('underscore.string'),
         shelljs = require('shelljs'),
+		pluralize = require('pluralize'),
         scriptBase = require('../script-base');
 
 var EntityGenerator = module.exports = function EntityGenerator(args, options, config) {
@@ -208,6 +209,7 @@ EntityGenerator.prototype.askForRelationships = function askForRelationships() {
                 otherEntityName: props.otherEntityName,
                 relationshipType: props.relationshipType,
                 otherEntityNameCapitalized: _s.capitalize(props.otherEntityName),
+				otherEntityNamePluralized: pluralize(props.otherEntityName),
                 otherEntityField: props.otherEntityField}
 
             relationshipNames.push(props.relationshipName);
@@ -235,6 +237,8 @@ EntityGenerator.prototype.files = function files() {
 
     this.entityClass = _s.capitalize(this.name);
     this.entityInstance = this.name.toLowerCase();
+	this.pluralEntityInstance = pluralize(this.entityInstance);
+	this.pluralEntityClass = _s.capitalize(pluralize(this.name));
     var resourceDir = 'src/main/resources/';
 
     this.template('src/main/java/package/domain/_Entity.java',
@@ -255,7 +259,7 @@ EntityGenerator.prototype.files = function files() {
     }
 
     this.template('src/main/webapp/views/_entities.html',
-        'src/main/webapp/views/' +    this.entityInstance + 's.html');
+        'src/main/webapp/views/' +    this.pluralEntityInstance + '.html');
 
     this.template('src/main/webapp/scripts/_entity-router.js',
         'src/main/webapp/scripts/' +    this.entityInstance + '/router_'+this.entityInstance+'.js');

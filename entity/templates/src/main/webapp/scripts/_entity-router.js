@@ -4,7 +4,7 @@
     .config(function ($routeProvider, $httpProvider, $translateProvider, USER_ROLES) {
             $routeProvider
                 .when('/<%= entityInstance %>', {
-                    templateUrl: 'views/<%= entityInstance %>s.html',
+                    templateUrl: 'views/<%= pluralEntityInstance %>.html',
                     controller: '<%= entityClass %>Controller',
                     resolve:{
                         resolved<%= entityClass %>: ['<%= entityClass %>', function (<%= entityClass %>) {
@@ -12,7 +12,7 @@
                         }]<% for (relationshipId in relationships) {
                             var relationshipClass = relationships[relationshipId].otherEntityNameCapitalized;%>,
                         resolved<%=relationshipClass%>: ['<%=relationshipClass%>', function (<%=relationshipClass%>) {
-                            return <%=relationshipClass%>.getList();
+                            return <%=relationshipClass%>.getList({limit: 2147483647});
                         }]<% } %>
                     },
                     access: {

@@ -1,6 +1,6 @@
 <div>
 
-    <h2><%= entityClass %>s</h2>
+    <h2><%= pluralEntityClass %></h2>
 
     <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#save<%= entityClass %>Modal" ng-click="clear()">
         <span class="glyphicon glyphicon-flash"></span> Create a new <%= entityClass %>
@@ -41,10 +41,11 @@
 <% for (relationshipId in relationships) {
     if (relationships[relationshipId].relationshipType == 'many-to-one') {
         var otherEntityName = relationships[relationshipId].otherEntityName;
+		var otherEntityNamePluralized = relationships[relationshipId].otherEntityNamePluralized;
                         %>
                         <div class="form-group">
                             <label><%=otherEntityName %></label>
-                            <select class="form-control" ng-model="<%=entityInstance %>.<%=otherEntityName %>" ng-options="<%=otherEntityName %>List.<%=relationships[relationshipId].otherEntityField %> for <%=otherEntityName %>List in <%=otherEntityName %>s track by <%=otherEntityName %>List.id">
+                            <select class="form-control" ng-model="<%=entityInstance %>.<%=otherEntityName %>" ng-options="<%=otherEntityName %>List.<%=relationships[relationshipId].otherEntityField %> for <%=otherEntityName %>List in <%=otherEntityNamePluralized %> track by <%=otherEntityName %>List.id">
                             </select>
                         </div><% } } %>
 

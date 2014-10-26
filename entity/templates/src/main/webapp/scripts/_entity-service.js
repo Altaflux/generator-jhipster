@@ -11,5 +11,6 @@
 	var relations = <%= JSON.stringify(relations).replace(new RegExp("\"", 'g'), "\'") %>;	
 	
 	ResourceConfigurer('<%= entityInstance %>', relations);
-	return DataRestRestangular.service('<%= entityInstance %>s');
+	ResourceConfigurer('<%= pluralEntityInstance %>', relations);
+	return DataRestRestangular.service('<%= pluralEntityInstance %>');
 });
