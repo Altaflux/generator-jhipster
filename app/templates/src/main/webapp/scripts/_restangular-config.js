@@ -15,7 +15,15 @@ var GETLIST_OP = 'getList';
         });
         RestangularConfigurer.addFullRequestInterceptor(function(element, operation, route, url, headers, params, httpConfig) {
             var returnElement = element;
+
             if (operation === 'patch' || operation === 'put' || operation === 'post') {
+                if (element.$relations) {
+                    for (var k in element.$relations) {
+                        element[k] = element.$relations[k];
+                    }
+                    delete element.$relations;
+                    delete element.$relValidations;
+                }
                 angular.forEach(element, function(value, key) {
                     if (!(key === LINKS_TAG)) {
                         if (angular.isObject(value)) {
@@ -34,7 +42,7 @@ var GETLIST_OP = 'getList';
         RestangularConfigurer.addResponseInterceptor(function(data, operation, route, url, response, deferred) {
             var returnData = data;
             var link = undefined;
-			
+
             if (operation == 'get') {
                 link = data[LINKS_TAG]['self'][HREF_TAG].split('/');
                 data.id = link[link.length - 1];
@@ -73,7 +81,7 @@ var GETLIST_OP = 'getList';
     });
 });
 
-jhipsterApp.factory('ResourceConfigurer', function(DataRestRestangular) {
+<%= angularAppName %>.factory('ResourceConfigurer', function(DataRestRestangular) {
 
     function configureResource(type, relations) {
         DataRestRestangular.addElementTransformer(type, false, function(element) {
@@ -87,21 +95,35 @@ jhipsterApp.factory('ResourceConfigurer', function(DataRestRestangular) {
             }
 
             if (element.fromServer) {
-                angular.forEach(relations, function(value, key) {
-                    if (value !== 'self') {
-                        element.one(value).get().then(function(response) {
-                            element[value] = response;
-                        })
-                    }
+                angular.forEach(relations, function(relation, key) {
+                    Object.defineProperty(element, relation, {
+                        get: function() {
+                            if (!element.$relations) {
+                                element.$relations = {};
+                                element.$relValidations = {};
+                            }
+                            if (!element.$relations[relation] && !element.$relValidations[relation]) {
+                                element.one(relation).get().then(function(response) {
+                                    element.$relations[relation] = response;
+                                })
+                                element.$relValidations[relation] = true;
+                                return undefined;
+                            } else {
+                                return element.$relations[relation];
+                            }
+                        },
+                        set: function(data) {
+                            element.$relations[relation] = data;
+                        }
+                    })
                 })
             }
             return element;
         });
     }
 
-
     return function(type, relations) {
-		configureResource(type, relations);
-		configureResource(type + 's', relations);
+        configureResource(type, relations);
+        configureResource(type + 's', relations);
     }
 });

@@ -1,4 +1,4 @@
-<%= angularAppName %>.factory('Pageable', function() {
+<%= angularAppName %>.factory('Pageable', function(DataRestRestangular) {
     var Pageable = function(resource, pagedData) {
 
         var sort_order = "id";
@@ -11,25 +11,42 @@
         var _number;
         var _totalElements;
         var _pagedData = pagedData;
+        var searchMethod = undefined;
 
         var search = function() {
             var sortBy = sort_order + ',' + sort_direction;
-            resource.getList({
+            var parameters = {
                 sort: sortBy,
                 limit: limit,
                 page: _page
-            }).then(function(data) {
-				if(data.page){
-					_more = !(data.page.number === data.page.totalPages - 1);
-					_less = !(data.page.number === 0);
-					_number = data.page.number;
-					_totalPages = data.page.totalPages;
-					_totalElements = data.page.totalElements;
-				}
-                _pagedData = data;
-            });
+            }
+            if (searchMethod) {
+                if (searchMethod.like) {
+                    parameters[searchMethod.param] = '%' + searchMethod.value + '%';
+                } else {
+                    parameters[searchMethod.param] = searchMethod.value;
+                }
+                DataRestRestangular.allUrl(_pagedData.route, DataRestRestangular.configuration.baseUrl + '/' + _pagedData.route + '/search/' + searchMethod.url).getList(parameters).then(function(data) {
+                    setCurrentPageParameters(data);
+                    _pagedData = data;
+
+                });
+            } else {
+                resource.getList(parameters).then(function(data) {
+                    setCurrentPageParameters(data);
+                    _pagedData = data;
+                });
+            }
         };
 
+        var startSearch = function(method) {
+            searchMethod = method;
+            limit = 20;
+            _page = 0;
+            _more = true;
+            _less = false;
+            search();
+        }
         var sort = function(col) {
             if (sort_direction === "desc") {
                 sort_direction = "asc";
@@ -38,6 +55,16 @@
             }
             sort_order = col;
             search();
+        }
+
+        var setCurrentPageParameters = function(pagedData) {
+            if (pagedData.page) {
+                _more = !(pagedData.page.number === pagedData.page.totalPages - 1);
+                _less = !(pagedData.page.number === 0);
+                _page = pagedData.page.number;
+                _totalPages = pagedData.page.totalPages;
+                _totalElements = pagedData.page.totalElements;
+            }
         }
 
         var show_next = function() {
@@ -73,9 +100,9 @@
         var reset = function() {
             limit = 20;
             _page = 0;
-            authors = [];
             _more = true;
             _less = false;
+            searchMethod = undefined;
             search();
         };
 
@@ -108,13 +135,7 @@
         }
 
         if (pagedData) {
-			if(pagedData.page){
-				_more = !(pagedData.page.number === pagedData.page.totalPages - 1);
-				_less = !(pagedData.page.number === 0);
-				_page = pagedData.page.number;
-				_totalPages = pagedData.page.totalPages;
-				_totalElements = pagedData.page.totalElements;
-			}
+            setCurrentPageParameters(pagedData);
         } else {
             _page = 0;
             search();
@@ -134,7 +155,8 @@
             data: data,
             sortOrder: sortOrder,
             sortDirection: sortDirection,
-            removeElement: removeElement
+            removeElement: removeElement,
+            startSearch: startSearch
         }
     }
     return Pageable;

@@ -7,6 +7,21 @@
 		$scope.<%= entityInstance %> = <%= entityClass %>.one();
 		
 		$scope.pagingData = new Pageable(<%= entityClass %>, resolved<%= entityClass %>);
+		<% var searchMethods = [];
+			for (fieldId in fields) {
+				var likeMethod = '';
+				if(fields[fieldId].fieldType == 'String'){likeMethod = 'Like';}
+				searchMethods.push({desc: 'By ' + fields[fieldId].fieldName + ' ' + likeMethod, url: 'findBy' + fields[fieldId].fieldName.charAt(0).toUpperCase() + fields[fieldId].fieldName.slice(1) + likeMethod, param : fields[fieldId].fieldName, like : fields[fieldId].fieldType == 'String'});
+		} %>
+		$scope.searchMethods = <%= JSON.stringify(searchMethods).replace(new RegExp("\"", 'g'), "\'") %>;
+		
+		$scope.setSearchMehod = function(method){
+			$scope.searchMethod = method;
+		}
+		
+		$scope.startSearch = function(){
+			$scope.pagingData.startSearch($scope.searchMethod);
+		}
 		
         $scope.create = function () {
 			$scope.<%= entityInstance %>.save().then(function(){
