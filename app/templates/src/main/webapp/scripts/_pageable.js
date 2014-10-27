@@ -45,6 +45,8 @@
             _page = 0;
             _more = true;
             _less = false;
+            sort_order = "id";
+            sort_direction = "asc";
             search();
         }
         var sort = function(col) {
@@ -102,6 +104,8 @@
             _page = 0;
             _more = true;
             _less = false;
+            sort_order = "id";
+            sort_direction = "asc";
             searchMethod = undefined;
             search();
         };
