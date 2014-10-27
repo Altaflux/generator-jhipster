@@ -12,7 +12,7 @@
                         }]<% for (relationshipId in relationships) {
                             var relationshipClass = relationships[relationshipId].otherEntityNameCapitalized;%>,
                         resolved<%=relationshipClass%>: ['<%=relationshipClass%>', function (<%=relationshipClass%>) {
-                            return <%=relationshipClass%>.getList({limit: 2147483647});
+                            return <%=relationshipClass%>.getList();
                         }]<% } %>
                     },
                     access: {

@@ -45,8 +45,16 @@
                         %>
                         <div class="form-group">
                             <label><%=otherEntityName %></label>
-                            <select class="form-control" ng-model="<%=entityInstance %>.<%=otherEntityName %>" ng-options="<%=otherEntityName %>List.<%=relationships[relationshipId].otherEntityField %> for <%=otherEntityName %>List in <%=otherEntityNamePluralized %> track by <%=otherEntityName %>List.id">
-                            </select>
+                            <button class="btn btn-default btn-group-justified dropdown-toggle " type="button" id="<%=otherEntityName %>Dropdown" data-toggle="dropdown">
+                                {{<%=entityInstance %>.<%=otherEntityName %>.<%=relationships[relationshipId].otherEntityField %>}} <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu modal-dropdown" aria-labelledby="<%=otherEntityName %>Dropdown" role="menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" ng-repeat="<%=otherEntityName %> in <%=otherEntityNamePluralized %>" ng-click="<%=entityInstance %>.<%=otherEntityName %> = <%=otherEntityName %>">{{<%=otherEntityName %>.<%=relationships[relationshipId].otherEntityField %>}}</a>
+                                </li>
+                                <li role="presentation" class="divider"></li>
+                                <li role="presentation" paged-dropdown datasource="<%=otherEntityNamePluralized %>"><a role="menuitem" tabindex="-1">Show More</a>
+                                </li>
+                            </ul>
                         </div><% } } %>
 
                     </div>
@@ -70,6 +78,7 @@
 					<div class="input-group-btn">
 						<button class="btn btn-default" type="submit" ng-click="startSearch()"><i class="glyphicon glyphicon-search"></i>
 						</button>
+						<button class="btn btn-default" type="button" ng-click="pagingData.reset()">X</button>
 					</div>
 				</div>
 
@@ -87,9 +96,9 @@
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
-                <tr>
+                <tr sort-container pager="pagingData">
                     <th sorted sort-by="id" pager="pagingData">ID</th><% for (fieldId in fields) { %>
-                    <th sorted sort-by="<%=fields[fieldId].fieldName%>" pager="pagingData"><%=fields[fieldId].fieldName%></th><% } %><% for (relationshipId in relationships) {
+                    <th sorted sort-by="<%=fields[fieldId].fieldName%>"><%=fields[fieldId].fieldName%></th><% } %><% for (relationshipId in relationships) {
                         if (relationships[relationshipId].relationshipType == 'many-to-one') { %>
                     <th sorted sort-by="<%=relationships[relationshipId].otherEntityName%>" pager="pagingData"><%=relationships[relationshipId].otherEntityName%></th><% } } %>
                     <th></th>
@@ -121,6 +130,6 @@
 			<li><span>{{pagingData.number() +1}}/{{pagingData.totalPages()}}
 					= {{pagingData.totalElements()}} Elements</span></li>
 			<li class="next {{pagingData.has_more()}}" ng-click="pagingData.show_next()"><span>next</span></li>
-		</ul>
+        </ul>
     </div>
 </div>
