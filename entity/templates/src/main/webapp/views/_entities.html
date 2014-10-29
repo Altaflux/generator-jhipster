@@ -34,7 +34,7 @@
         fieldInputType = 'checkbox';
     }%>
                         <div class="form-group">
-                            <label><%=fields[fieldId].fieldName%></label>
+                            <label><%=fields[fieldId].fieldNameCapitalized%></label>
                             <input type="<%=fieldInputType%>" class="form-control"
                                    ng-model="<%=entityInstance %>.<%=fields[fieldId].fieldName%>">
                         </div><% } %>
@@ -51,7 +51,15 @@
                             <ul class="dropdown-menu modal-dropdown scrollable-menu" aria-labelledby="<%=otherEntityName %>Dropdown" role="menu" rest-loader="<%=otherEntityNamePluralized %>">
                                 <li role="presentation"><a role="menuitem" tabindex="-1" ng-repeat="<%=otherEntityName %> in <%=otherEntityNamePluralized %>" ng-click="<%=entityInstance %>.<%=otherEntityName %> = <%=otherEntityName %>">{{<%=otherEntityName %>.<%=relationships[relationshipId].otherEntityField %>}}</a></li>
                             </ul>
-                        </div><% } } %>
+                        </div><% } else if (relationships[relationshipId].relationshipType == 'many-to-many' && relationships[relationshipId].ownerSide == true) {
+        var otherEntityName = relationships[relationshipId].otherEntityName;
+		var otherEntityNamePluralized = relationships[relationshipId].otherEntityNamePluralized;
+                            %>
+                         <div class="form-group">
+                             <label><%=otherEntityName %></label>
+                             <select class="form-control" multiple ng-model="<%=entityInstance %>.<%=otherEntityNamePluralized %>" rest-loader="<%=otherEntityNamePluralized %>" ng-options="<%=otherEntityName %>List.<%=relationships[relationshipId].otherEntityField %> for <%=otherEntityName %>List in <%=otherEntityNamePluralized %> track by <%=otherEntityName %>List.id">
+							 </select>
+                         </div><% } } %>
 
                     </div>
                     <div class="modal-footer">
@@ -94,7 +102,7 @@
             <thead>
                 <tr sort-container="pagingData">
                     <th sorted="id" pager="pagingData">ID</th><% for (fieldId in fields) { %>
-                    <th sorted="<%=fields[fieldId].fieldName%>"><%=fields[fieldId].fieldName%></th><% } %><% for (relationshipId in relationships) {
+                    <th sorted="<%=fields[fieldId].fieldName%>"><%=fields[fieldId].fieldNameCapitalized%></th><% } %><% for (relationshipId in relationships) {
                         if (relationships[relationshipId].relationshipType == 'many-to-one') { %>
                     <th sorted sort-by="<%=relationships[relationshipId].otherEntityName%>" pager="pagingData"><%=relationships[relationshipId].otherEntityName%></th><% } } %>
                     <th></th>

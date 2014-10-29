@@ -372,6 +372,8 @@ JhipsterGenerator.prototype.app = function app() {
     removefile(resourceDir + 'mails/messages/messages_pl.properties');
     removefile(resourceDir + 'mails/messages/messages_ru.properties');
     removefile(resourceDir + 'mails/messages/messages_tr.properties');
+    removefile(resourceDir + 'i18n/messages_pt.properties');
+    removefile(webappDir + 'i18n/pt.json');
     removefile(webappDir + 'protected/transparent.gif');
     removefile(webappDir + 'styles/famfamfam-flags.css');
     removefile(webappDir + 'images/famfamfam-flags.png');
@@ -427,9 +429,11 @@ JhipsterGenerator.prototype.app = function app() {
     this.copy(resourceDir + '/i18n/messages_fr.properties', resourceDir + 'i18n/messages_fr.properties');
     this.copy(resourceDir + '/i18n/messages_kr.properties', resourceDir + 'i18n/messages_kr.properties');
     this.copy(resourceDir + '/i18n/messages_pl.properties', resourceDir + 'i18n/messages_pl.properties');
-    this.copy(resourceDir + '/i18n/messages_pt.properties', resourceDir + 'i18n/messages_pt.properties');
+    this.copy(resourceDir + '/i18n/messages_pt_BR.properties', resourceDir + 'i18n/messages_pt_BR.properties');
     this.copy(resourceDir + '/i18n/messages_ru.properties', resourceDir + 'i18n/messages_ru.properties');
+    this.copy(resourceDir + '/i18n/messages_sv.properties', resourceDir + 'i18n/messages_sv.properties');
     this.copy(resourceDir + '/i18n/messages_tr.properties', resourceDir + 'i18n/messages_tr.properties');
+    this.copy(resourceDir + '/i18n/messages_zh_TW.properties', resourceDir + 'i18n/messages_zh_TW.properties');
 
     // Thymeleaf templates
     this.copy(resourceDir + '/templates/error.html', resourceDir + 'templates/error.html');
@@ -482,13 +486,16 @@ JhipsterGenerator.prototype.app = function app() {
 
     if (this.authenticationType == 'token') {
         this.template('src/main/java/package/config/oauth2/_MongoDBTokenStore.java', javaDir + 'config/oauth2/MongoDBTokenStore.java');
-        this.template('src/main/java/package/config/oauth2/_OAuth2AuthenticationReadConverter.java', javaDir + 'config/oauth2/OAuth2AuthenticationReadConverter.java');
         this.template('src/main/java/package/config/_OAuth2ServerConfiguration.java', javaDir + 'config/OAuth2ServerConfiguration.java');
         this.template('src/main/java/package/domain/_OAuth2AuthenticationAccessToken.java', javaDir + 'domain/OAuth2AuthenticationAccessToken.java');
         this.template('src/main/java/package/domain/_OAuth2AuthenticationRefreshToken.java', javaDir + 'domain/OAuth2AuthenticationRefreshToken.java');
         this.template('src/main/java/package/repository/_OAuth2AccessTokenRepository.java', javaDir + 'repository/OAuth2AccessTokenRepository.java');
         this.template('src/main/java/package/repository/_OAuth2RefreshTokenRepository.java', javaDir + 'repository/OAuth2RefreshTokenRepository.java');
 
+    }
+
+    if (this.databaseType == 'nosql' &&  this.authenticationType == 'token') {
+        this.template('src/main/java/package/config/oauth2/_OAuth2AuthenticationReadConverter.java', javaDir + 'config/oauth2/OAuth2AuthenticationReadConverter.java');
     }
 
     this.template('src/main/java/package/config/_SecurityConfiguration.java', javaDir + 'config/SecurityConfiguration.java');
@@ -629,9 +636,12 @@ JhipsterGenerator.prototype.app = function app() {
     this.template(webappDir + '/i18n/_fr.json', webappDir + 'i18n/fr.json');
     this.template(webappDir + '/i18n/_kr.json', webappDir + 'i18n/kr.json');
     this.template(webappDir + '/i18n/_pl.json', webappDir + 'i18n/pl.json');
-    this.template(webappDir + '/i18n/_pt.json', webappDir + 'i18n/pt.json');
+    this.template(webappDir + '/i18n/_pt-br.json', webappDir + 'i18n/pt-br.json');
     this.template(webappDir + '/i18n/_ru.json', webappDir + 'i18n/ru.json');
+    this.template(webappDir + '/i18n/_sv.json', webappDir + 'i18n/sv.json');
     this.template(webappDir + '/i18n/_tr.json', webappDir + 'i18n/tr.json');
+    this.template(webappDir + '/i18n/_zh-tw.json', webappDir + 'i18n/zh-tw.json');
+
 
     // Protected resources - used to check if a customer is still connected
     this.copy(webappDir + '/protected/authentication_check.gif', webappDir + '/protected/authentication_check.gif');
@@ -689,7 +699,8 @@ JhipsterGenerator.prototype.app = function app() {
 
     // Images
     this.copy(webappDir + 'images/development_ribbon.png', webappDir + 'images/development_ribbon.png');
-    this.copy(webappDir + 'images/hipster.jpg', webappDir + 'images/hipster.jpg');
+    this.copy(webappDir + 'images/hipster.png', webappDir + 'images/hipster.png');
+    this.copy(webappDir + 'images/hipster2x.png', webappDir + 'images/hipster2x.png');
 
     var indexScripts = [
         'bower_components/modernizr/modernizr.js',

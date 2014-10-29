@@ -18,8 +18,7 @@ var gulp = require('gulp'),
     es = require('event-stream'),
     flatten = require('gulp-flatten'),
     clean = require('gulp-clean'),
-    replace = require('gulp-replace'),
-    browserify = require('gulp-browserify');
+    replace = require('gulp-replace');
 
 var karma = require('gulp-karma')({configFile: 'src/test/javascript/karma.conf.js'});
 
@@ -117,7 +116,14 @@ gulp.task('server', ['watch'<% if(useCompass) { %>, 'compass'<% } %>], function(
                         var options = url.parse('http://localhost:8080/dump');
                         options.route = '/dump';
                         return proxy(options);
-                    })()<% if (devDatabaseType == 'h2Memory') { %>,
+                    })()<% if (authenticationType == 'token') { %>,
+                    (function() {
+                        var url = require('url');
+                        var proxy = require('proxy-middleware');
+                        var options = url.parse('http://localhost:8080/oauth/token');
+                        options.route = '/oauth/token';
+                        return proxy(options);
+                    })()<% } %><% if (devDatabaseType == 'h2Memory') { %>,
                     (function() {
                         var url = require('url');
                         var proxy = require('proxy-middleware');
@@ -132,7 +138,7 @@ gulp.task('server', ['watch'<% if(useCompass) { %>, 'compass'<% } %>], function(
 });
 
 gulp.task('watch', function() {
-    gulp.watch(yeoman.app + 'scripts/**', ['browserify']);<% if(useCompass) { %>
+    gulp.watch(yeoman.app + 'scripts/**');<% if(useCompass) { %>
     gulp.watch(yeoman.scss, ['compass']); <% } %>
     gulp.watch('src/images/**', ['images']);
     livereload();

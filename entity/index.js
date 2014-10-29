@@ -25,12 +25,13 @@ var EntityGenerator = module.exports = function EntityGenerator(args, options, c
     this.fields = [];
     this.fieldsContainLocalDate = false;
     this.fieldsContainBigDecimal = false;
+    this.fieldsContainOwnerManyToMany = false;
+    this.fieldsContainOneToMany = false;
     this.relationshipId = 0;
     this.relationships = [];
 };
 
-var fieldNames = ['id'];
-var relationshipNames = [];
+var fieldNamesUnderscored = ['id'];
 
 util.inherits(EntityGenerator, yeoman.generators.Base);
 util.inherits(EntityGenerator, scriptBase);
@@ -53,7 +54,7 @@ EntityGenerator.prototype.askForFields = function askForFields() {
             type: 'input',
             name: 'fieldName',
             validate: function (input) {
-                if ((/^([a-zA-Z0-9_]*)$/.test(input)) && input != '' && input != 'id' && fieldNames.indexOf(input) == -1) return true;
+                if ((/^([a-zA-Z0-9_]*)$/.test(input)) && input != '' && input != 'id' && fieldNamesUnderscored.indexOf(_s.underscored(input)) == -1) return true;
                 return 'Your field name cannot contain special characters or use an already existing field name';
             },
             message: 'What is the name of your field?'
@@ -102,7 +103,7 @@ EntityGenerator.prototype.askForFields = function askForFields() {
                 fieldNameCapitalized: _s.capitalize(props.fieldName),
                 fieldNameUnderscored: _s.underscored(props.fieldName)}
 
-            fieldNames.push(props.fieldName);
+            fieldNamesUnderscored.push(_s.underscored(props.fieldName));
             this.fields.push(field);
             if (props.fieldType == 'LocalDate') {
                 this.fieldsContainLocalDate = true;
@@ -145,7 +146,7 @@ EntityGenerator.prototype.askForRelationships = function askForRelationships() {
             type: 'input',
             name: 'otherEntityName',
             validate: function (input) {
-                if ((/^([a-zA-Z0-9_]*)$/.test(input)) && input != '' && input != 'id' && fieldNames.indexOf(input) == -1) return true;
+                if ((/^([a-zA-Z0-9_]*)$/.test(input)) && input != '' && input != 'id' && fieldNamesUnderscored.indexOf(_s.underscored(input)) == -1) return true;
                 return 'Your relationship name cannot contain special characters or use an already existing field name';
             },
             message: 'What is the name of the other entity?'
@@ -165,6 +166,14 @@ EntityGenerator.prototype.askForRelationships = function askForRelationships() {
                 {
                     value: 'many-to-one',
                     name: 'many-to-one'
+                },
+                {
+                    value: 'many-to-many',
+                    name: 'many-to-many'
+                },
+                {
+                    value: 'one-to-one',
+                    name: 'one-to-one'
                 }
             ],
             default: 0
@@ -180,7 +189,25 @@ EntityGenerator.prototype.askForRelationships = function askForRelationships() {
         },
         {
             when: function (response) {
-                return (response.relationshipAdd == true && response.relationshipType == 'many-to-one');
+                return (response.relationshipAdd == true && (response.relationshipType == 'many-to-many' || response.relationshipType == 'one-to-one'));
+            },
+            type: 'confirm',
+            name: 'ownerSide',
+            message: 'Is this entity the owner of the relationship?',
+            default: false
+        },
+        {
+            when: function(response) {
+                return (response.relationshipAdd == true && response.ownerSide == true && !shelljs.test('-f', 'src/main/java/' + packageFolder + '/domain/' + _s.capitalize(response.otherEntityName) + '.java'))
+            },
+            type: 'confirm',
+            name: 'noOtherEntity2',
+            message: 'WARNING! You have selected that this entity is the owner of a relationship on another entity, that does not exist yet. This will probably fail, as you will need to create a foreign key on a table that does not exist. We advise you to create the other side of this relationship first (do the non-owning side before the owning side). Are you sure you want to continue?',
+            default: false
+        },
+        {
+            when: function (response) {
+                return (!(response.noOtherEntity == false || response.noOtherEntity2 == false) && response.relationshipAdd == true && (response.relationshipType == 'many-to-one' || (response.relationshipType == 'many-to-many' && response.ownerSide == true)));
             },
             type: 'input',
             name: 'otherEntityField',
@@ -188,19 +215,10 @@ EntityGenerator.prototype.askForRelationships = function askForRelationships() {
                 return 'When you display this relationship with AngularJS, which field from \'' + response.otherEntityName + '\' do you want to use?'
             },
             default: 'id'
-        },
-        {
-            when: function (response) {
-                return (response.relationshipAdd == true && response.relationshipType == 'many-to-many');
-            },
-            type: 'confirm',
-            name: 'ownerSide',
-            message: 'Is this entity the owner of the relationship?',
-            default: false
         }
     ];
     this.prompt(prompts, function (props) {
-        if (props.noOtherEntity == false) {
+        if (props.noOtherEntity == false || props.noOtherEntity2 == false) {
             console.log(chalk.red('Generation aborted, as requested by the user.'));
             return;
         }
@@ -209,10 +227,18 @@ EntityGenerator.prototype.askForRelationships = function askForRelationships() {
                 otherEntityName: props.otherEntityName,
                 relationshipType: props.relationshipType,
                 otherEntityNameCapitalized: _s.capitalize(props.otherEntityName),
-				otherEntityNamePluralized: pluralize(props.otherEntityName),
-                otherEntityField: props.otherEntityField}
 
-            relationshipNames.push(props.relationshipName);
+				otherEntityNamePluralized: pluralize(props.otherEntityName),
+                otherEntityField: props.otherEntityField,
+                ownerSide: props.ownerSide}
+
+            if (props.relationshipType == 'many-to-many' && props.ownerSide == true) {
+                this.fieldsContainOwnerManyToMany = true;
+            }
+            if (props.relationshipType == 'one-to-many') {
+                this.fieldsContainOneToMany = true;
+            }
+            fieldNamesUnderscored.push(_s.underscored(props.otherEntityName));
             this.relationships.push(relationship);
         }
         console.log(chalk.red('===========' + _s.capitalize(this.name) + '=============='));

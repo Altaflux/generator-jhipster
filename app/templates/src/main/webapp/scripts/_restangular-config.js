@@ -6,7 +6,6 @@ var HREF_TAG = 'href';
 var LINKS_TAG = '_links';
 var GETLIST_OP = 'getList';
 
-
 <%= angularAppName %>.factory('DataRestRestangular', function(Restangular) {
     return Restangular.withConfig(function(RestangularConfigurer) {
         RestangularConfigurer.setBaseUrl(BASE_URL);
@@ -27,7 +26,13 @@ var GETLIST_OP = 'getList';
                 angular.forEach(element, function(value, key) {
                     if (!(key === LINKS_TAG)) {
                         if (angular.isObject(value)) {
-                            element[key] = value._links.self.href;
+                            if (angular.isArray(value)) {
+                                angular.forEach(value, function(collectionElement, elementKey) {
+                                    element[key][elementKey] = collectionElement._links.self.href
+                                })
+                            } else {
+                                element[key] = value._links.self.href;
+                            }
                         }
                     }
                 })
@@ -96,24 +101,31 @@ var GETLIST_OP = 'getList';
 
             if (element.fromServer) {
                 angular.forEach(relations, function(relation, key) {
-                    Object.defineProperty(element, relation, {
+                    Object.defineProperty(element, relation.name, {
                         get: function() {
                             if (!element.$relations) {
                                 element.$relations = {};
                                 element.$relValidations = {};
                             }
-                            if (!element.$relations[relation] && !element.$relValidations[relation]) {
-                                element.one(relation).get().then(function(response) {
-                                    element.$relations[relation] = response;
-                                })
-                                element.$relValidations[relation] = true;
+                            if (!element.$relations[relation.name] && !element.$relValidations[relation.name]) {
+
+                                if (relation.many) {
+                                    element.one(relation.name).getList().then(function(response) {
+                                        element.$relations[relation.name] = response;
+                                    })
+                                } else {
+                                    element.one(relation.name).get().then(function(response) {
+                                        element.$relations[relation.name] = response;
+                                    })
+                                }
+                                element.$relValidations[relation.name] = true;
                                 return undefined;
                             } else {
-                                return element.$relations[relation];
+                                return element.$relations[relation.name];
                             }
                         },
                         set: function(data) {
-                            element.$relations[relation] = data;
+                            element.$relations[relation.name] = data;
                         }
                     })
                 })
