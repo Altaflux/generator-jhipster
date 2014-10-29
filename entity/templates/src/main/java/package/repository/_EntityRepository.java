@@ -24,7 +24,7 @@ public interface <%= entityClass %>Repository extends <% if (databaseType == 'sq
 	
 <% if (fieldsContainOwnerManyToMany == true) { %>
     @Query("select <%= entityInstance %> from <%= entityClass %> <%= entityInstance %> <% for (relationshipId in relationships) {
-        if (relationships[relationshipId].relationshipType == 'many-to-many' && relationships[relationshipId].ownerSide == true) { %>left join fetch <%= entityInstance %>.<%= relationships[relationshipId].otherEntityName %>s <% } } %>where <%= entityInstance %>.id = :id")
+        if (relationships[relationshipId].relationshipType == 'many-to-many' && relationships[relationshipId].ownerSide == true) { %>left join fetch <%= entityInstance %>.<%= relationships[relationshipId].otherEntityName %>s <% } } %>where <%= entityInstance %>.id = :id")
     <%= entityClass %> findOneWithEagerRelationships(@Param("id") Long id);
 <% } %>
 }
