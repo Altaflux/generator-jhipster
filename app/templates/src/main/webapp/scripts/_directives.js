@@ -125,37 +125,34 @@ angular.module('<%= angularAppName %>')
             }
         };
 	})	
-    .directive('pagedDropdown', function(DataRestRestangular) {
+    .directive('restLoader', function(DataRestRestangular) {
 	    return {
 	        restrict: 'A',
 	        priority: 500,
 	        scope: {
-	            datasource: '='
+	            restLoader: '='
 	        },
 	        link: function($scope, element, attr) {
-                if (!$scope.datasource._links.next) {
-                    element.addClass('disabled');
-                }
-	            element.bind('click', function(e) {
-	                if ($scope.datasource._links.next) {
-	                    DataRestRestangular.allUrl($scope.datasource.route, $scope.datasource._links.next.href).getList().then(function(response) {
-	                        $scope.datasource.push.apply($scope.datasource, response);
-	                        $scope.datasource._links = response._links;
-							if(!$scope.datasource._links.next){
-                                element.addClass('disabled');
-                            }
-	                    });
-	                }
-	                e.stopPropagation();
-	            });
+                var raw = element[0];
+                
+                element.bind('scroll', function() {
+                    if (raw.scrollTop + raw.offsetHeight >= raw.scrollHeight) {
+                        if ($scope.restLoader._links.next) {
+                            DataRestRestangular.allUrl($scope.restLoader.route, $scope.restLoader._links.next.href).getList().then(function(response) {
+                                $scope.restLoader.push.apply($scope.restLoader, response);
+                                $scope.restLoader._links = response._links;
+                            });
+                        }
+                    }
+                });
 	        }
 	    };
-	})
+    })
 	.directive('sortContainer', function() {
 	        return {
 	            restriction: 'A',
 	            scope: {
-	                pager: '=pager',
+	                pager: '=sortContainer',
 	            },
 	            controller: function($scope, $element, $attrs) {
 	                this.pager = $scope.pager;
@@ -167,7 +164,7 @@ angular.module('<%= angularAppName %>')
 	            restriction: 'A',
 	            require: '^sortContainer',
 	            scope: {
-	                attribute: '@sortBy'
+	                sorted: '@'
 	            },
 	            transclude: true,
 	            link: function(scope, element, attrs, $sortContainerController) {
@@ -175,13 +172,13 @@ angular.module('<%= angularAppName %>')
 	            },
 	            template: '<a ng-click="do_sort()" ng-transclude></a>' + ' <span ng-show="do_show(\'desc\')"><i class="glyphicon glyphicon-circle-arrow-down"></i></span>' + '<span ng-show="do_show(\'asc\')"><i class="glyphicon glyphicon-circle-arrow-up"></i></span>',
 	            controller: function($scope, $element, $attrs) {
-	                $scope.sort_by = $scope.attribute;
+	                $scope.sorted = $scope.attribute;
 
 	                $scope.do_sort = function() {
-	                    $scope.pager.sort($scope.sort_by);
+	                    $scope.pager.sort($scope.sorted);
 	                };
 	                $scope.do_show = function(asc) {
-	                    return (asc != $scope.pager.sortDirection()) && ($scope.pager.sortOrder() == $scope.sort_by);
+	                    return (asc != $scope.pager.sortDirection()) && ($scope.pager.sortOrder() == $scope.sorted);
 	                };
 	            }
 	        };

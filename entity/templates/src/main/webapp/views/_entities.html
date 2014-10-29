@@ -48,12 +48,8 @@
                             <button class="btn btn-default btn-group-justified dropdown-toggle " type="button" id="<%=otherEntityName %>Dropdown" data-toggle="dropdown">
                                 {{<%=entityInstance %>.<%=otherEntityName %>.<%=relationships[relationshipId].otherEntityField %>}} <span class="caret"></span>
                             </button>
-                            <ul class="dropdown-menu modal-dropdown" aria-labelledby="<%=otherEntityName %>Dropdown" role="menu">
-                                <li role="presentation"><a role="menuitem" tabindex="-1" ng-repeat="<%=otherEntityName %> in <%=otherEntityNamePluralized %>" ng-click="<%=entityInstance %>.<%=otherEntityName %> = <%=otherEntityName %>">{{<%=otherEntityName %>.<%=relationships[relationshipId].otherEntityField %>}}</a>
-                                </li>
-                                <li role="presentation" class="divider"></li>
-                                <li role="presentation" paged-dropdown datasource="<%=otherEntityNamePluralized %>"><a role="menuitem" tabindex="-1">Show More</a>
-                                </li>
+                            <ul class="dropdown-menu modal-dropdown scrollable-menu" aria-labelledby="<%=otherEntityName %>Dropdown" role="menu" rest-loader="<%=otherEntityNamePluralized %>">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" ng-repeat="<%=otherEntityName %> in <%=otherEntityNamePluralized %>" ng-click="<%=entityInstance %>.<%=otherEntityName %> = <%=otherEntityName %>">{{<%=otherEntityName %>.<%=relationships[relationshipId].otherEntityField %>}}</a></li>
                             </ul>
                         </div><% } } %>
 
@@ -96,9 +92,9 @@
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
-                <tr sort-container pager="pagingData">
-                    <th sorted sort-by="id" pager="pagingData">ID</th><% for (fieldId in fields) { %>
-                    <th sorted sort-by="<%=fields[fieldId].fieldName%>"><%=fields[fieldId].fieldName%></th><% } %><% for (relationshipId in relationships) {
+                <tr sort-container="pagingData">
+                    <th sorted="id" pager="pagingData">ID</th><% for (fieldId in fields) { %>
+                    <th sorted="<%=fields[fieldId].fieldName%>"><%=fields[fieldId].fieldName%></th><% } %><% for (relationshipId in relationships) {
                         if (relationships[relationshipId].relationshipType == 'many-to-one') { %>
                     <th sorted sort-by="<%=relationships[relationshipId].otherEntityName%>" pager="pagingData"><%=relationships[relationshipId].otherEntityName%></th><% } } %>
                     <th></th>
