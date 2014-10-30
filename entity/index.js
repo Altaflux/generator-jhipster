@@ -224,7 +224,7 @@ EntityGenerator.prototype.askForRelationships = function askForRelationships() {
         }
         if (props.relationshipAdd) {
             var relationship = {relationshipId: this.relationshipId,
-                otherEntityName: props.otherEntityName,
+                otherEntityName: props.otherEntityName.charAt(0).toLowerCase() + props.otherEntityName.slice(1),
                 relationshipType: props.relationshipType,
                 otherEntityNameCapitalized: _s.capitalize(props.otherEntityName),
 
@@ -262,9 +262,10 @@ EntityGenerator.prototype.askForRelationships = function askForRelationships() {
 EntityGenerator.prototype.files = function files() {
 
     this.entityClass = _s.capitalize(this.name);
-    this.entityInstance = this.name.toLowerCase();
+    this.entityInstance = this.name.charAt(0).toLowerCase() + this.name.slice(1);
 	this.pluralEntityInstance = pluralize(this.entityInstance);
 	this.pluralEntityClass = _s.capitalize(pluralize(this.name));
+
     var resourceDir = 'src/main/resources/';
 
     this.template('src/main/java/package/domain/_Entity.java',
