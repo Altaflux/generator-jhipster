@@ -24,8 +24,8 @@ import javax.inject.Inject;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    <% if (authenticationType == 'cookie') { %>
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {<% if (authenticationType == 'cookie') { %>
+
     @Inject
     private Environment env;
 
@@ -74,36 +74,37 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/app/rest/activate")<% if (websocket == 'atmosphere') { %>
             .antMatchers("/websocket/activity")<% } %><% } %><% if (devDatabaseType != 'h2Memory') { %>;<% } else { %>
             .antMatchers("/console/**");<% } %>
-    }
-    <% if (authenticationType == 'cookie') { %>
+    }<% if (authenticationType == 'cookie') { %>
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
+            .authenticationEntryPoint(authenticationEntryPoint)
+        .and()
             .rememberMe()
-                .rememberMeServices(rememberMeServices)
-                .key(env.getProperty("jhipster.security.rememberme.key"))
-                .and()
+            .rememberMeServices(rememberMeServices)
+            .key(env.getProperty("jhipster.security.rememberme.key"))
+        .and()
             .formLogin()
-                .loginProcessingUrl("/app/authentication")
-                .successHandler(ajaxAuthenticationSuccessHandler)
-                .failureHandler(ajaxAuthenticationFailureHandler)
-                .usernameParameter("j_username")
-                .passwordParameter("j_password")
-                .permitAll()
-                .and()
+            .loginProcessingUrl("/app/authentication")
+            .successHandler(ajaxAuthenticationSuccessHandler)
+            .failureHandler(ajaxAuthenticationFailureHandler)
+            .usernameParameter("j_username")
+            .passwordParameter("j_password")
+            .permitAll()
+        .and()
             .logout()
-                .logoutUrl("/app/logout")
-                .logoutSuccessHandler(ajaxLogoutSuccessHandler)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
-                .and()
+            .logoutUrl("/app/logout")
+            .logoutSuccessHandler(ajaxLogoutSuccessHandler)
+            .deleteCookies("JSESSIONID")
+            .permitAll()
+        .and()
             .csrf()
-                .disable()
+            .disable()
             .headers()
-                .frameOptions().disable()
+            .frameOptions()
+            .disable()
             .authorizeRequests()
                 .antMatchers("/app/rest/register").permitAll()
                 .antMatchers("/app/rest/activate").permitAll()
@@ -125,15 +126,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
                 .antMatchers("/protected/**").authenticated();
 
-    }<% } %>
-    
-    <% if (authenticationType == 'token') { %>
+    }<% } %><% if (authenticationType == 'token') { %>
+
 	@Override
 	@Bean
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}<% } %>
-	
+
     @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
     private static class GlobalSecurityConfiguration extends GlobalMethodSecurityConfiguration {<% if (authenticationType == 'token') { %>
 

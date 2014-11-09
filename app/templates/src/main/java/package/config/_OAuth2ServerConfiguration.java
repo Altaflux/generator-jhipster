@@ -22,8 +22,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;<% if (databaseType == 'sql') { %>
-import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;<% } %><% if (databaseType == 'nosql') { %>
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;<% } %>
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;<% } %>
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.inject.Inject;<% if (databaseType == 'sql') { %>
@@ -47,11 +46,11 @@ public class OAuth2ServerConfiguration {
             http
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
+            .and()
                 .logout()
                 .logoutUrl("/app/logout")
                 .logoutSuccessHandler(ajaxLogoutSuccessHandler)
-                .and()
+            .and()
                 .csrf()
                 .requireCsrfProtectionMatcher(new AntPathRequestMatcher("/oauth/authorize"))
                 .disable()
@@ -59,7 +58,7 @@ public class OAuth2ServerConfiguration {
                 .frameOptions().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+            .and()
                 .authorizeRequests()
                 .antMatchers("/app/rest/authenticate").permitAll()
                 .antMatchers("/app/rest/register").permitAll()
@@ -92,8 +91,8 @@ public class OAuth2ServerConfiguration {
         private static final String PROP_SECRET = "secret";
         private static final String PROP_TOKEN_VALIDITY_SECONDS = "tokenValidityInSeconds";
 
-        private RelaxedPropertyResolver propertyResolver;
-        <% if (databaseType == 'sql') { %>
+        private RelaxedPropertyResolver propertyResolver;<% if (databaseType == 'sql') { %>
+
         @Inject
         private DataSource dataSource;<% } %><% if (databaseType == 'nosql') { %>
 
